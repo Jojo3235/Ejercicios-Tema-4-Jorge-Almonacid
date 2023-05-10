@@ -62,8 +62,8 @@ def newton_raphson(f, f_prime, x_0, eps=None, steps=50):
     return x_m
 
 def main():
-    f = lambda x: x**5 + x**3 + x + 16
-    f_prime = lambda x: 5*x**4 + 3*x**2 + 1
+    # f = lambda x: x**5 + x**3 + x + 16
+    # f_prime = lambda x: 5*x**4 + 3*x**2 + 1
     f_2 = lambda x: x**3 + x + 16
     f_2_prime = lambda x: 3*x**2 + 1
     print("Bisección")
