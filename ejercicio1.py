@@ -1,69 +1,50 @@
-# Carácter, Frecuencia, Código
-# I,0.28,10
-# N,0.16,110
-# T,0.08,010
-# E,0.16,011
-# L,0.08,001
-# G,0.08,000
-# C,0.08,1111
-# A,0.08,1110
+import heapq
 
-class nodoArbol(object):
-    
-    def __init__(self, info):
-        self.info = info
-        self.izq = None
-        self.der = None
+class HuffmanNode:
+    def __init__(self, char, frecuencia, izquierda=None, derecha=None):
+        self.char = char
+        self.frecuencia = frecuencia
+        self.izquierda = izquierda
+        self.derecha = derecha
 
-def insertar_nodo(raiz, info):
-    if raiz == None:
-        raiz = nodoArbol(info)
-    else:
-        if info < raiz.info:
-            raiz.izq = insertar_nodo(raiz.izq, info)
+    def __lt__(self, other):
+        return self.freq < other.freq
+
+    @staticmethod
+    def construir_arbol_huffman(frecuencias):
+        nodos = []
+        for caracter, frecuencia in frecuencias.items():
+            nodos.append(HuffmanNode(caracter, frecuencia))
+        while len(nodos) > 1:
+            nodos.sort(key=lambda x: x.frecuencia)
+            nodo_izquierda = nodos.pop(0)
+            nodo_derecha = nodos.pop(0)
+            nodo_padre = HuffmanNode(None, nodo_izquierda.frecuencia + nodo_derecha.frecuencia)
+            nodo_padre.izquierda = nodo_izquierda
+            nodo_padre.derecha = nodo_derecha
+            nodos.append(nodo_padre)
+        return nodos[0]
+
+def decode_string(root, s):
+    result = []
+    curr = root
+    for bit in s:
+        if bit == '0':
+            curr = curr.izquierda
         else:
-            raiz.der = insertar_nodo(raiz.der, info)
-    return raiz
+            curr = curr.derecha
+        if curr.char is not None:
+            result.append(curr.char)
+            curr = root
+    return ''.join(result)
 
-def eliminar_nodo(raiz, clave):
-    x = None
-    if raiz != None:
-        if clave < raiz.info:
-            raiz.izq, x = eliminar_nodo(raiz.izq, clave)
-        elif clave > raiz.info:
-            raiz.der, x = eliminar_nodo(raiz.der, clave)
-        else:
-            x = raiz.info
-            if raiz.izq == None:
-                raiz = raiz.der
-            elif raiz.der == None:
-                raiz = raiz.izq
-            else:
-                raiz.izq, maximo = remplazar(raiz.izq)
-                raiz.info = maximo
-    return raiz, x
-
-def remplazar(raiz):
-    aux = None
-    if raiz.der == None:
-        aux = raiz
-        raiz = raiz.izq
-    else:
-        raiz.der, aux = remplazar(raiz.der)
-    return raiz, aux
-
-# crear arbol
-
-arbol = nodoArbol('raíz')
-
-# insertar nodos
-
-arbol = insertar_nodo(arbol, 'I')
-arbol = insertar_nodo(arbol, 'N')
-arbol = insertar_nodo(arbol, 'T')
-arbol = insertar_nodo(arbol, 'E')
-arbol = insertar_nodo(arbol, 'L')
-arbol = insertar_nodo(arbol, 'G')
-arbol = insertar_nodo(arbol, 'C')
-arbol = insertar_nodo(arbol, 'A')
-
+# Example usage
+freq_map_1 = {'A': 0.098, 'B': 0.017, 'C': 0.035, 'D': 0.026, 'E': 0.125, 'G': 0.026, 'I': 0.053, 'L': 0.053, 'M': 0.026, 'N': 0.053, 'O': 0.062, 'P': 0.035, 'Q': 0.008, 'R': 0.08, 'S': 0.035, 'T': 0.026, 'U': 0.035, 'V': 0.017, ' ': 0.15, ',': 0.017}
+root_1 = HuffmanNode.construir_arbol_huffman(freq_map_1)
+encoded_1 = "10001011101011000010111010001110000011011000000111100111101001011000011010011100110100010111010111111101000011110011111100111101000110001100000010110101111011111110111010110110111001110110111100111111100101001010010100000101101011000101100110100011100100101100001100100011010110101011111111111011011101110010000100101011000111111100010001110110011001011010001101111101011010001101110000000111001001010100011111100001100101101011100110011110100011000110000001011010111110011100"
+decoded_1 = decode_string(root_1, encoded_1)
+print("Mensaje 1: ", decoded_1)
+root_2 = HuffmanNode.construir_arbol_huffman(freq_map_1)
+encoded_2 = "0110101011011100101000111101011100110111010110110100001000111010100101111010011111110111001010001111010111001101110101100001100010011010001110010010001100010110011001110010010000111101111010"
+decoded_2 = decode_string(root_2, encoded_2)
+print("Mensaje 2: ", decoded_2)

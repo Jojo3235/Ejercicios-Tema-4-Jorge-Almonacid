@@ -1,5 +1,14 @@
 import random
 
+def pedir_entero(mensaje):
+    while True:
+        try:
+            entero = int(input(mensaje))
+            break
+        except ValueError:
+            print('Debe ingresar un número entero')
+    return int(entero)
+
 class Mission:
     def __init__(self, mission_type, planet, general, priority):
         self.mission_type = mission_type
@@ -10,12 +19,12 @@ class Mission:
     def assign_resources(self):
         resources = {}
         if self.priority == 'alta':
-            resources['Stormtroopers'] = int(input('Ingrese la cantidad de Stormtroopers: '))
-            resources['Scout Troopers'] = int(input('Ingrese la cantidad de Scout Troopers: '))
-            resources['speeder bike'] = int(input('Ingrese la cantidad de speeder bike: '))
+            resources['Stormtroopers'] = pedir_entero('Ingrese la cantidad de Stormtroopers: ')
+            resources['Scout Troopers'] = pedir_entero('Ingrese la cantidad de Scout Troopers: ')
+            resources['speeder bike'] = pedir_entero('Ingrese la cantidad de speeder bike: ')
             vehicles = ['AT-AT', 'AT-RT', 'AT-TE', 'AT-DP', 'AT-ST', 'AT-M6', 'AT-MP', 'AT-DT']
             for vehicle in vehicles:
-                resources[vehicle] = int(input(f'Ingrese la cantidad de {vehicle}: '))
+                resources[vehicle] = pedir_entero(f'Ingrese la cantidad de {vehicle}: ')
         elif self.priority == 'baja':
             if self.mission_type == 'exploración':
                 resources['Scout Troopers'] = 15
@@ -113,4 +122,5 @@ def main():
     mission_queue.total_resources()
 
 
-main()
+if __name__ == "__main__":
+    main()

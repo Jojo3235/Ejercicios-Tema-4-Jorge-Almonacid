@@ -13,116 +13,54 @@
 # la estación Victoria Train Station hasta la estación Liverpool Street Station,
 # la estación St. Pancras hasta la estación King's Cross;
 
-class nodoArista(object):
-    def __init__(self, nombre, destino):
-        self.nombre = nombre
-        self.destino = destino
-        self.sig = None
+import heapq
 
-class nodoVertice(object):
-    def __init__(self, nombre, tipo):
-        self.nombre = nombre
-        self.tipo = tipo
-        self.sig = None
-        self.ady = Arista()
+# Definir el grafo
+graph = {
+    'King\'s Cross': {'Euston': 1, 'Farringdon': 2},
+    'Euston': {'King\'s Cross': 1, 'Camden Town': 1},
+    'Farringdon': {'King\'s Cross': 2, 'Liverpool Street Station': 2, 'Barbican': 1},
+    'Camden Town': {'Euston': 1, 'Chalk Farm': 1},
+    'Chalk Farm': {'Camden Town': 1, 'Hampstead Heath': 2},
+    'Hampstead Heath': {'Chalk Farm': 2, 'Golders Green': 3},
+    'Golders Green': {'Hampstead Heath': 3, 'Finchley Central': 4},
+    'Finchley Central': {'Golders Green': 4, 'High Barnet': 5},
+    'High Barnet': {'Finchley Central': 5},
+    'Barbican': {'Farringdon': 1, 'Moorgate': 1},
+    'Moorgate': {'Barbican': 1, 'Liverpool Street Station': 1},
+    'Liverpool Street Station': {'Farringdon': 2, 'Moorgate': 1, 'Whitechapel': 2, 'Victoria Train Station': 4},
+    'Whitechapel': {'Liverpool Street Station': 2, 'Shadwell': 1},
+    'Shadwell': {'Whitechapel': 1, 'Bank': 3},
+    'Bank': {'Shadwell': 3, 'Waterloo': 4},
+    'Waterloo': {'Bank': 4},
+    'Victoria Train Station': {'Westminster': 2, 'Pimlico': 1, 'Liverpool Street Station': 4},
+    'Westminster': {'Victoria Train Station': 2, 'Waterloo': 2},
+    'Pimlico': {'Victoria Train Station': 1, 'Vauxhall': 2},
+    'Vauxhall': {'Pimlico': 2, 'Clapham Junction': 4},
+    'Clapham Junction': {'Vauxhall': 4, 'Balham': 3, 'Wimbledon': 6},
+    'Balham': {'Clapham Junction': 3, 'Tooting Bec': 2},
+    'Tooting Bec': {'Balham': 2, 'Tooting Broadway': 1},
+    'Tooting Broadway': {'Tooting Bec': 1, 'Colliers Wood': 1},
+    'Colliers Wood': {'Tooting Broadway': 1, 'South Wimbledon': 1},
+    'South Wimbledon': {'Colliers Wood': 1, 'Wimbledon': 1},
+    'Wimbledon': {'South Wimbledon': 1, 'Clapham Junction': 6},
+    'St. Pancras': {'King\'s Cross': 1}
+}
 
-class Grafo(object):
-    def __init__(self, dirigido=True):
-        self.inicio = None
-        self.dirigido = dirigido
-        self.size = 0
+def dijkstra(graph, start, end):
+    distances = {node: float('inf') for node in graph}
+    distances[start] = 0
+    queue = [(0, start)]
+    while len(queue) > 0:
+        current_distance, current_node = heapq.heappop(queue)
+        if current_distance > distances[current_node]:
+            continue
+        for neighbor, weight in graph[current_node].items():
+            distance = current_distance + weight
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                heapq.heappush(queue, (distance, neighbor))
+    return distances[end]
 
-class Arista(object):
-    def __init__(self):
-        self.inicio = None
-        self.size = 0
-
-
-def insertar_vertice(grafo, nombre, tipo):
-    nodo = nodoVertice(nombre, tipo)
-    if grafo.inicio is None:
-        grafo.inicio = nodo
-    else:
-        aux = grafo.inicio
-        while aux.sig is not None:
-            aux = aux.sig
-        aux.sig = nodo
-    grafo.size += 1
-
-def insertar_arista(grafo, origen, destino, nombre):
-    nodo = nodoArista(nombre, destino)
-    aux = grafo.inicio
-    while aux is not None:
-        if aux.nombre == origen:
-            break
-        aux = aux.sig
-    aux2 = aux.ady.inicio
-    if aux2 is None:
-        aux.ady.inicio = nodo
-    else:
-        while aux2.sig is not None:
-            aux2 = aux2.sig
-        aux2.sig = nodo
-    grafo.size += 1
-
-def barrido_vertices(grafo):
-    aux = grafo.inicio
-    while aux is not None:
-        print('Nombre:', aux.nombre, 'Tipo:', aux.tipo)
-        print('Adyacentes:')
-        barrido_arista(aux.ady)
-        aux = aux.sig
-
-def barrido_arista(vertice):
-    aux = vertice.inicio
-    while aux is not None:
-        print('Nombre:', aux.nombre, 'Destino:', aux.destino)
-        aux = aux.sig
-
-def dijkstra(grafo, origen, destino):
-    if grafo.inicio is not None:
-        if origen != destino:
-            dic = {}
-            aux = grafo.inicio
-            while aux is not None:
-                dic[aux.nombre] = {'distancia': 99999
-                    , 'visitado': False, 'anterior': None}
-                aux = aux.sig
-            dic[origen]['distancia'] = 0
-            actual = origen
-            while actual != destino:
-                adyacentes = []
-                aux = grafo.inicio
-                while aux is not None:
-                    if aux.nombre == actual:
-                        break
-                    aux = aux.sig
-                ady = aux.ady.inicio
-                while ady is not None:
-                    adyacentes.append(ady.destino)
-                    ady = ady.sig
-                for a in adyacentes:
-                    if dic[a]['visitado'] is False:
-                        if dic[actual]['distancia'] + 1 < dic[a]['distancia']:
-                            dic[a]['distancia'] = dic[actual]['distancia'] + 1
-                            dic[a]['anterior'] = actual
-                dic[actual]['visitado'] = True
-                distancia_minima = 99999
-                for v in dic:
-                    if dic[v]['visitado'] is False:
-                        if dic[v]['distancia'] < distancia_minima:
-                            distancia_minima = dic[v]['distancia']
-                            actual = v
-            pila = []
-            while actual is not None:
-                pila.append(actual)
-                actual = dic[actual]['anterior']
-            while len(pila) > 0:
-                print(pila.pop())
-        else:
-            print('El origen y el destino son el mismo')
-    else:
-        print('El grafo está vacío')
-
-def main():
-    
+print('La distancia más corta entre King\'s Cross y Waterloo es: ', dijkstra(graph, 'King\'s Cross', 'Waterloo'))
+print('La distancia más corta entre King\'s Cross y St.Pancras es: ', dijkstra(graph, 'St. Pancras', 'King\'s Cross' ))
