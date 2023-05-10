@@ -117,7 +117,7 @@ def main():
     mission_queue.add_mission(Mission('contención', 'Kashyyyk', 'Palpatine', 'baja'))
     while input('¿Desea agregar una misión? (s/n): ') in VALIDACIONES:
         mission_queue.ask_mission()
-
+    #por alguna razón esto genera una misión de más
     mission_queue.assign_missions()
     mission_queue.total_resources()
 
